@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const webpack = require('webpack');
 
@@ -10,6 +11,10 @@ module.exports = {
     module: {
         rules: [
             {
+              test: /\.(html)$/,
+              use: ['html-loader'],
+            },
+            {
                 test: /\.(js)$/,
                 use: ['babel-loader'],
                 exclude: /node_modules/
@@ -17,7 +22,8 @@ module.exports = {
             {
                 test: /\.(sa|sc|c)ss$/,
                 use: [
-                    'postcss-loader',
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
                     'sass-loader'
                 ]
             }
@@ -25,6 +31,7 @@ module.exports = {
     },
     plugins: [
         new webpack.ProgressPlugin(),
+        new MiniCssExtractPlugin(),
         new webpack.HotModuleReplacementPlugin(),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
