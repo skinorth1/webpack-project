@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const webpack = require('webpack');
+const devMode = process.env.NODE_ENV !== 'production';
 
 module.exports = {
     entry: {
@@ -22,7 +23,7 @@ module.exports = {
             {
                 test: /\.(sa|sc|c)ss$/,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    devMode ? 'style-loader' : MiniCssExtractPlugin.loader,
                     'css-loader',
                     'sass-loader'
                 ]
@@ -34,7 +35,8 @@ module.exports = {
                         loader: 'url-loader',
                         options: {
                             limit:5*1024,
-                            outputPath: 'images'
+                            outputPath: 'images',
+                            name: devMode ? '[name].[ext]' : '[name].[contenthash:8].[ext]'
                         }
                     }
                 ]
@@ -43,7 +45,9 @@ module.exports = {
     },
     plugins: [
         new webpack.ProgressPlugin(),
-        new MiniCssExtractPlugin(),
+        new MiniCssExtractPlugin({
+            filename: devMode ? '[name].style.css' : '[name].[contenthash:8].css',
+        }),
         new webpack.HotModuleReplacementPlugin(),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
@@ -51,7 +55,8 @@ module.exports = {
         })
     ],
     output: {
-        filename: '[name].bundle.js',
-        path: path.resolve(__dirname, 'dist')
+        filename: devMode ? '[name].bundle.js' : '[name].[contenthash:8].js',
+        path: path.resolve(__dirname, 'dist'),
+        publicPath: '/'
     }
 };
